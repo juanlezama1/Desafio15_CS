@@ -14,18 +14,21 @@ const generateToken = (user) => {
     return token // Devuelve un TOKEN encriptado, que dura 12 horas. 
 }
 
-export default generateToken
+const generateURLToken = (email) => {
 
-// Ejempo de token generado
+    // Contenido del token (un objeto con sólo el email que blanqueará su password)
+    const token_content = {email}
 
-// console.log(generateToken({
-//     _id: '662a7a28808507063f7d2a92',
-//     first_name: 'Fernando',
-//     last_name: "Guriaga",
-//     age: 55,
-//     email: "fernandoguriaga@gmail.com",
-//     password: "fernando123guriaga456",
-//     category: "Standard_User",
-//     __v: 0
-// }))
+    // El tiempo de expiración del token (1 HORA)
+    const URL_expiracyTime = '1h'
 
+    // La clave secreta del token
+    const URL_private_key = config_vars.URL_jwt_secret
+
+    // Genero el Token con su firma
+    const URL_token = jwt.sign(token_content, URL_private_key, {expiresIn: URL_expiracyTime})
+
+    return URL_token
+}
+
+export {generateToken, generateURLToken}

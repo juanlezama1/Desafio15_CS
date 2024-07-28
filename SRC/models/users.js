@@ -33,7 +33,7 @@ const userSchema = new Schema ({
 
     category: {
         type: String,
-        enum: ['Standard_User', 'Admin'],
+        enum: ['Standard_User', 'Admin', 'Premium'],
         default: 'Standard_User',
         required: true
     },

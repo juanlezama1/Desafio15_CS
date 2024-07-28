@@ -10,7 +10,11 @@ const config_vars = {
     cookies_secret: process.env.COOKIES_SECRET,
     hash_cost: process.env.HASH_COST,
     jwt_secret: process.env.JWT_SECRET,
-    port: process.env.PORT
+    port: process.env.PORT,
+    email_port: process.env.EMAIL_PORT,
+    email_user: process.env.EMAIL_USER,
+    email_password: process.env.EMAIL_PASSWORD,
+    URL_jwt_secret: process.env.URL_JWT_SECRET
 }
 
 export default config_vars

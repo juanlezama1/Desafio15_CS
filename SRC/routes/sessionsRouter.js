@@ -1,7 +1,6 @@
 import { Router } from "express"
-import { userModel } from '../models/users.js'
-import { createHash, comparePSW } from "../utils/bcrypt.js"
 import passport from "passport"
+import sendResetPSWEmail from "../controllers/sessionController.js"
 
 // Devolverá el usuario en req.user, en caso de éxito.
 const sessionsRouter = Router ()
@@ -133,6 +132,35 @@ sessionsRouter.get('/testJWT', passport.authenticate('jwt', {session: false}), (
 sessionsRouter.get('/current', async (req, res) => {
     res.status(200).send(req.session.user)
 
+})
+
+sessionsRouter.post('/resetPSW', async (req, res) => {
+
+    const {email} = req.body
+
+    try {
+        await sendResetPSWEmail (email)
+        res.status(200).send("Correo de recuperación enviado correctamente!")
+    }
+
+    catch (error)
+
+    {
+        req.logger.error("Error al enviar el correo de recuperación!", error)
+        res.status(500).send("Error al enviar el correo de recuperación!")
+    }
+})
+
+sessionsRouter.get('/changePSW', async (req, res) => {
+
+    // Token recibido
+    const url_token = req.query.token
+
+    // Verifico si el token es válido
+
+    
+
+    res.status(200).send("TE FALTA MANDAR EL TOKEN!")
 })
 
 export default sessionsRouter
