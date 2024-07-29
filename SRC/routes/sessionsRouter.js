@@ -1,6 +1,10 @@
 import { Router } from "express"
 import passport from "passport"
 import sendResetPSWEmail from "../controllers/sessionController.js"
+import jwt from 'jsonwebtoken'
+import config_vars from "../dotenv.js"
+import { getUserByEmail, getUserIdByEmail, updateUserPSW } from "../controllers/userController.js"
+import { comparePSW, createHash } from "../utils/bcrypt.js"
 
 // Devolverá el usuario en req.user, en caso de éxito.
 const sessionsRouter = Router ()
@@ -139,6 +143,7 @@ sessionsRouter.post('/resetPSW', async (req, res) => {
     const {email} = req.body
 
     try {
+        await getUserIdByEmail(email)
         await sendResetPSWEmail (email)
         res.status(200).send("Correo de recuperación enviado correctamente!")
     }
@@ -146,10 +151,13 @@ sessionsRouter.post('/resetPSW', async (req, res) => {
     catch (error)
 
     {
-        req.logger.error("Error al enviar el correo de recuperación!", error)
-        res.status(500).send("Error al enviar el correo de recuperación!")
+        req.logger.error("Usuario no  enviar el correo de recuperación - Usuario no existente!")
+        res.status(400).send("Error al enviar el correo de recuperación - Usuario no existente!")
     }
 })
+
+
+// Entrás por GET cuando apretás el link de recuperación en el email
 
 sessionsRouter.get('/changePSW', async (req, res) => {
 
@@ -158,9 +166,57 @@ sessionsRouter.get('/changePSW', async (req, res) => {
 
     // Verifico si el token es válido
 
+    try {    
+        jwt.verify(url_token, config_vars.URL_jwt_secret)
+        res.status(200).send("(Formulario de cambio de contraseña con FrontEnd - Termina enviando por POST a /changePSW la nueva contraseña y el mismo token como parámetro)")
+    }
     
+    catch (error)
 
-    res.status(200).send("TE FALTA MANDAR EL TOKEN!")
+    {
+        req.logger.warning("El token recibido fue modificado o expiró")
+        res.status(400).send("URL Expirada!")
+    }
+})
+
+sessionsRouter.post('/changePSW', async (req, res) => {
+
+    // Token recibido
+    const url_token = req.query.token
+
+    let user_email
+    let new_password
+    
+    // VERIFICA EL TOKEN, Y OBTIENE EMAIL Y NUEVA PASSWORD
+
+    try {    
+        const user_token = jwt.verify(url_token, config_vars.URL_jwt_secret)
+        user_email = user_token.email
+        new_password = req.body.new_password
+    }
+    
+    catch (error)
+
+    {
+        req.logger.warning("El token recibido fue modificado o expiró")
+        res.status(400).send("URL Expirada!")
+    }
+
+    // VERIFICA QUE LA NUEVA PASSWORD NO SEA IGUAL A LA ANTERIOR, Y LA ACTUALIZA. 
+    // El getUserByEmail no debería fallar nunca porque ya se confirmó que el usuario existía
+
+    const user = await getUserByEmail(user_email)
+    
+    if (comparePSW(new_password, user.password))
+        res.status(400).send("La nueva contraseña no puede ser igual a la anterior")
+
+    else
+
+    {
+        const encrypted_psw = createHash(new_password)
+        await updateUserPSW (user_email, encrypted_psw)
+        res.status(200).send("La contraseña se actualizó con éxito!")
+    }
 })
 
 export default sessionsRouter

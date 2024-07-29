@@ -45,7 +45,7 @@ const strategyLocalRegister = new localStrategy (
         
         try {
             // Solicito el resto de los valores, sacando username (email en este caso) y password
-            const {first_name, last_name, age} = req.body  
+            const {first_name, last_name, age} = req.body
             const user = await userModel.findOne({email: email})
     
             if (user)

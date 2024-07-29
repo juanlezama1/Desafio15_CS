@@ -1,7 +1,7 @@
-import bcrypt, { hash } from 'bcrypt'
+import bcrypt from 'bcrypt'
 import config_vars from '../dotenv.js'
 
-const hash_cost = config_vars.hash_cost // Variable que determina la 'cantidad de rondas de encriptación' que sufrirá la pass
+const hash_cost = parseInt(config_vars.hash_cost) // Variable que determina la 'cantidad de rondas de encriptación' que sufrirá la pass
 
 const createHash = (password) => {
     return bcrypt.hashSync(password, bcrypt.genSaltSync(hash_cost))

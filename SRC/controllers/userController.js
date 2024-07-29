@@ -30,4 +30,13 @@ const getUserIdByEmail = async (email) => {
     return user_id._id
 }
 
-export {getUserName, getUserStatus, getUserIdByEmail}
+const getUserByEmail = async (email) => {
+    const my_user = await userModel.findOne({email})
+    return my_user
+}
+
+const updateUserPSW = async (email, new_password) => {
+    await userModel.findOneAndUpdate({email}, {password: new_password})
+}
+
+export {getUserName, getUserStatus, getUserIdByEmail, getUserByEmail, updateUserPSW}

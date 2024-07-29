@@ -12,6 +12,7 @@ import initializatePassport from './config/passport/passport.js'
 import GitHubStrategy from 'passport-github2'
 import { ticketModel } from './models/tickets.js'
 import {logger_middleware, logger} from './utils/logger.js'
+import { createHash } from './utils/bcrypt.js'
 
 const my_app = express ()
 
@@ -51,6 +52,7 @@ my_app.set('views', __dirname + '/views')
 const my_server = my_app.listen(PORT, () => {
     logger.info(`Escuchando solicitudes en el puerto ${PORT} ...`)
 })
+
 
 // Aclaración: Ya dejé la DB cargada con 10 productos, 4 usuarios y 3 carritos de antemano
 // Dejo comentado el código adjunto donde se cargaron los productos/carritos/usuarios para evitar que se carguen de nuevo

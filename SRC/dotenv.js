@@ -1,6 +1,5 @@
 import dotenv from 'dotenv'
 
-
 // Configura las variables de entorno, a las que se puede acceder por process.env.___
 dotenv.config ()
 
